@@ -1,0 +1,62 @@
+author: mongoose-os
+description: A Mongoose OS app skeleton
+version: 1.0
+
+libs_version: ${mos.version}
+modules_version: ${mos.version}
+mongoose_os_version: ${mos.version}
+
+# Optional. List of tags for online search.
+tags:
+  - c
+
+# List of files / directories with C sources. No slashes at the end of dir names.
+sources:
+  - src
+
+# List of dirs. Files from these dirs will be copied to the device filesystem
+filesystem:
+  - fs
+
+# Custom configuration entries, settable via "device configuration"
+# Below is a custom firmware configuration example.
+# Uncomment and modify according to your needs:
+
+# config_schema:
+#  - ["my_app", "o", {title: "My app custom settings"}]
+#  - ["my_app.bool_value", "b", false, {title: "Some boolean value"}]
+#  - ["my_app.string_value", "s", "", {title: "Some string value"}]
+#  - ["my_app.int_value", "i", 123, {title: "Some integer value"}]
+
+# These settings get compiled into the C structure, and can be accessed
+# from the C code this way:
+#
+# printf("Hello from %s!\n", mgos_sys_config_get_device_id());
+#
+# Settings are cool: can be modified remotely without full firmware upgrade!
+#
+# To see all available compiled settings, buid the firmware and open
+# build/gen/mgos_config.h file.
+#
+# Also, in this config_schema section, you can override existing
+# settings that has been created by other libraries. For example, debug log
+# level is 2 by default. For this firmware we can override it to 3:
+#
+# config_schema:
+#  - ["debug.level", 3]
+
+config_schema:
+  - ["app", "o", { title: "My app custom settings" }]
+
+libs:
+  - origin: https://github.com/mongoose-os-libs/boards
+  - origin: https://github.com/mongoose-os-libs/ca-bundle
+  - origin: https://github.com/mongoose-os-libs/rpc-service-config
+  - origin: https://github.com/mongoose-os-libs/rpc-service-fs
+  - origin: https://github.com/mongoose-os-libs/rpc-uart
+  - origin: https://github.com/mongoose-os-libs/mjs
+  - origin: https://github.com/mongoose-os-libs/dht
+  - origin: https://github.com/mongoose-os-libs/adc
+
+# Used by the mos tool to catch mos binaries incompatible with this file format
+manifest_version: 2017-09-29
