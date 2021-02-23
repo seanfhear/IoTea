@@ -36,7 +36,7 @@ Full list of libraries: [https://github.com/mongoose-os-libs](https://github.com
 
 ## Connecting the hardware
 
-### DHT Sensor
+### DHT Sensor
 
 | Sensor Pin | ESP32 Pin |
 |------------|-----------|
