@@ -13,7 +13,7 @@ let mPin = 33;
 
 // Enable pins
 let dht = DHT.create(dhtPin, DHT.DHT11);
-ADC.enable(mhPin);
+ADC.enable(mPin);
 
 Timer.set(1000, true, function() {
 	let moisturePer = 100.00 - ((ADC.read(mPin) / mLevels) * 100.00);
