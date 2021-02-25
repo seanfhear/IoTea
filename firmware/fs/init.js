@@ -19,4 +19,3 @@ Timer.set(1000, true, function() {
 	let moisturePer = 100.00 - ((ADC.read(mPin) / mLevels) * 100.00);
 	print('Temperature: ', dht.getTemp(), ' Humidity: ', dht.getHumidity(), ' Moisture: ', moisturePer);
 }, null);
-
