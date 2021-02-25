@@ -8,11 +8,14 @@ jobs:
     runs-on:
       ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        id: checkout_code
       - uses: yaourdt/mongoose-os-action@v2.0.2
         with:
-          mos-yml-path: .
+          mos-yml-path: firmware/
           platform: esp32
       - uses: actions/upload-artifact@v2
         with:
           name: firmware
-          path: firmware/build/fw.zip
+          path: firmware/
