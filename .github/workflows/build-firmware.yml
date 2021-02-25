@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: yaourdt/mongoose-os-action@v2.0.2
         with:
-          mos-yml-path: firmware/mos.yml
+          mos-yml-path: .
           platform: esp32
       - uses: actions/upload-artifact@v2
         with:
