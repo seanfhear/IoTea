@@ -6,11 +6,6 @@ load('api_dht.js');
 load('api_adc.js');
 load('stepper.js');
 
-// Stepper motor.
-let stepperInit = ffi('void stepper_init(int, int, int, int, int)');
-let setSpeed = ffi('void set_speed(int)');
-let step = ffi('void step(int)');
-
 let NUMBER_OF_STEPS_PER_REV = 2038;
 
 let stepper = Object.create(Stepper);
