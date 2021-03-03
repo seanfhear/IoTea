@@ -8,22 +8,42 @@ let timer = null;
 let pin1, pin2, pin3, pin4;
 
 let stepMotor = function(thisStep) {
-  if (thisStep === 0) { // 1010
-    GPIO.write(pin1, true);
+  if (thisStep === 0) { // 0001
+    GPIO.write(pin1, false);
+    GPIO.write(pin2, false);
+    GPIO.write(pin3, false);
+    GPIO.write(pin4, true);
+  } else if (thisStep === 1) { // 0011
+    GPIO.write(pin1, false);
+    GPIO.write(pin2, false);
+    GPIO.write(pin3, true);
+    GPIO.write(pin4, true);
+  } else if (thisStep === 2) { // 0010
+    GPIO.write(pin1, false);
     GPIO.write(pin2, false);
     GPIO.write(pin3, true);
     GPIO.write(pin4, false);
-  } else if (thisStep === 1) { // 0110
+  } else if (thisStep === 3) { // 0110
     GPIO.write(pin1, false);
     GPIO.write(pin2, true);
     GPIO.write(pin3, true);
     GPIO.write(pin4, false);
-  } else if (thisStep === 2) { // 0101
+  } else if (thisStep === 4) { // 0100
     GPIO.write(pin1, false);
     GPIO.write(pin2, true);
     GPIO.write(pin3, false);
-    GPIO.write(pin4, true);
-  } else if (thisStep === 3) { // 1001
+    GPIO.write(pin4, false);
+  } else if (thisStep === 5) { // 1100
+    GPIO.write(pin1, true);
+    GPIO.write(pin2, true);
+    GPIO.write(pin3, false);
+    GPIO.write(pin4, false);
+  } else if (thisStep === 6) { // 1000
+    GPIO.write(pin1, true);
+    GPIO.write(pin2, false);
+    GPIO.write(pin3, false);
+    GPIO.write(pin4, false);
+  } else if (thisStep === 7) { // 1001
     GPIO.write(pin1, true);
     GPIO.write(pin2, false);
     GPIO.write(pin3, false);
@@ -57,7 +77,7 @@ let Stepper = {
       if (stepsLeft > 0) {
         // Step the motor.
         stepNumber++;
-        stepMotor(stepNumber % 4);
+        stepMotor(stepNumber % 8);
         stepsLeft--;
       } else {
         stepNumber = 0;
