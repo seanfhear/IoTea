@@ -6,7 +6,7 @@ load('api_dht.js');
 load('api_adc.js');
 load('stepper.js');
 
-let NUMBER_OF_STEPS_PER_REV = 4076;
+let NUMBER_OF_STEPS_PER_REV = 4096; // half step
 
 let stepper = Object.create(Stepper);
 
