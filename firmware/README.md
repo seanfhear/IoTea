@@ -28,7 +28,9 @@ libs:
 
 This program uses:
 
+- `aws`: Enables Amazon AWS IoT integration with Mongoose OS
 - `mjs`: Enables the use of javascript files
+- `mqtt`: Enables MQTT protocol support with Mongoose OS
 - `dht`: Enables support for the DHT temperature/humidity sensors
 - `adc`: Enables support for analog-to-digital conversion on pins
 
@@ -55,3 +57,39 @@ Full list of libraries: [https://github.com/mongoose-os-libs](https://github.com
 On the breadboard, you can connect the `3V3` pin on the ESP32 to the 
 (+) rail and the `GND` pin to the (-) rail and connect each of the 
 sensors to those rails for power.
+
+## AWS CLI Setup
+
+1. Install [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+
+2. Configure CLI with appropriate provided credentials:
+```bash
+aws configure
+```
+
+3. Verify correct setup being able to run:
+```bash
+aws iot list-things
+```
+
+## Device Setup
+
+1. Build:
+```bash
+mos build --platform esp32
+```
+
+2. Flash:
+```bash
+mos flash
+```
+
+3. Wifi Setup:
+```bash
+mos wifi <WIFI-SSID> <WIFI-PASSWORD>
+```
+
+4. AWS IoT Setup:
+```bash
+mos aws-iot-setup
+```
