@@ -59,7 +59,11 @@ libs:
   - origin: https://github.com/mongoose-os-libs/mjs
   - origin: https://github.com/mongoose-os-libs/dht
   - origin: https://github.com/mongoose-os-libs/adc
+<<<<<<< HEAD
   - origin: https://github.com/mongoose-os-libs/mqtt
+=======
+  - origin: https://github.com/mongoose-os-libs/wifi
+>>>>>>> main
 
 # Used by the mos tool to catch mos binaries incompatible with this file format
 manifest_version: 2017-09-29
