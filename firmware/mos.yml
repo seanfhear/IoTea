@@ -47,8 +47,10 @@ filesystem:
 
 config_schema:
   - ["app", "o", { title: "My app custom settings" }]
+  - ["i2c.enable", true]
 
 libs:
+  - origin: https://github.com/mongoose-os-libs/aws
   - origin: https://github.com/mongoose-os-libs/boards
   - origin: https://github.com/mongoose-os-libs/ca-bundle
   - origin: https://github.com/mongoose-os-libs/rpc-service-config
@@ -57,6 +59,7 @@ libs:
   - origin: https://github.com/mongoose-os-libs/mjs
   - origin: https://github.com/mongoose-os-libs/dht
   - origin: https://github.com/mongoose-os-libs/adc
+  - origin: https://github.com/mongoose-os-libs/mqtt
   - origin: https://github.com/mongoose-os-libs/wifi
 
 # Used by the mos tool to catch mos binaries incompatible with this file format
