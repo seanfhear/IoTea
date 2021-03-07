@@ -7,15 +7,10 @@ load('api_adc.js');
 load('api_dht.js');
 load('stepper.js');
 
-<<<<<<< HEAD
 // MQTT Topics
 let vitalsTopic = 'iotea/vitals';
 
-// Stepper Motor
-let NUMBER_OF_STEPS_PER_REV = 2038;
-=======
 let NUMBER_OF_STEPS_PER_REV = 4096; // half step
->>>>>>> main
 
 let stepper = Object.create(Stepper);
 
