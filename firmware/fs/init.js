@@ -8,13 +8,20 @@ load('api_dht.js');
 load('stepper.js');
 load('api_rpc.js');
 
+// Pins
+let sPin1 = 14, sPin2 = 27, sPin3 = 26, sPin4 = 25;
+let pumpPin = 13;
+let dhtPin = 32;
+let mPin = 33;
+
 // MQTT Topics
 let vitalsTopic = 'iotea/vitals';
 
 // Stepper.
 let NUMBER_OF_STEPS_PER_REV = 4096; // half step
+
 let stepper = Object.create(Stepper);
-stepper.init(NUMBER_OF_STEPS_PER_REV, 14, 27, 26, 25);
+stepper.init(NUMBER_OF_STEPS_PER_REV, sPin1, sPin2, sPin3, sPin4);
 stepper.setSpeed(1);
 
 RPC.addHandler('Turn', function(args) {
@@ -27,7 +34,6 @@ RPC.addHandler('Turn', function(args) {
 });
 
 // Water Pump.
-let pumpPin = 13;
 GPIO.set_mode(pumpPin, GPIO.MODE_OUTPUT);
 GPIO.write(pumpPin, false);
 RPC.addHandler('Pump', function(args) {
@@ -44,12 +50,6 @@ RPC.addHandler('Pump', function(args) {
 
 // Moisture and temperature
 let mLevels = 4095;
-
-// Pins
-let dhtPin = 32;
-let mPin = 33;
-
-// Enable pins
 let dht = DHT.create(dhtPin, DHT.DHT11);
 ADC.enable(mPin);
 

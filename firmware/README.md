@@ -16,6 +16,14 @@ output.
 
 The analog output for this sensor is 0-4095 where 4095 is no moisture.
 
+### Stepper Motor
+
+The stepper connects to a driver that allows for a microcontroller to send a high or low signal to each of the four stators to control it.
+
+### Water Pump
+
+The water pump cannot be directly controlled by a microcontroller as it only has a power input. To control it, we have a relay that can be controlled by a microcontroller.
+
 ### Libraries
 
 Libraries can be added to the `mos.yml` file at:
@@ -38,25 +46,50 @@ Full list of libraries: [https://github.com/mongoose-os-libs](https://github.com
 
 ## Connecting the hardware
 
+### Breadboard
+
+Connect the provided power supply to the breadboard power rails and ensure that the 5V and VCC pins are selected to provide 5V to the rail.
+
+### ESP32
+
+Connect the __GND__ pin to the (-) rail on the breadboard.
+
 ### DHT Sensor
 
-| Sensor Pin | ESP32 Pin |
-|------------|-----------|
-| +          | 3V3       |
-| -          | GND       |
-| out        | 32        |
+| Sensor Pin | ESP32 Pin | Breadboard |
+|------------|-----------|------------|
+| +          | -         | (+) rail   |
+| -          | -         | (-) rail   |
+| out        | 32        | -          |
 
 ### Soil Moisture Sensor
 
-| Sensor Pin | ESP32 Pin |
-|------------|-----------|
-| VCC+       | 3V3       |
-| GND        | GND       |
-| AO         | 33        |
+| Sensor Pin | ESP32 Pin | Breadboard |
+|------------|-----------|------------|
+| VCC+       | -         | (+) rail   |
+| GND        | -         | (-) rail   |
+| A0         | 33        | -          |
 
-On the breadboard, you can connect the `3V3` pin on the ESP32 to the 
-(+) rail and the `GND` pin to the (-) rail and connect each of the 
-sensors to those rails for power.
+### Stepper Motor
+
+| Driver Pin | ESP32 Pin | Breadboard |
+|------------|-----------|------------|
+| IN1        | 14        | -          |
+| IN2        | 27        | -          |
+| IN3        | 26        | -          |
+| IN4        | 25        | -          |
+| (+)        | -         | (+) rail   |
+| (-)        | -         | (-) rail   |
+
+### Water Pump
+
+| Relay Pin | ESP32 Pin | Breadboard | Water Pump |
+|-----------|-----------|------------|------------|
+| DC+       | -         | (+) rail   | -          |
+| DC-       | -         | (-) rail   | -          |
+| IN        | 13        | -          | -          |
+| NO        | -         | -          | negative (black) |
+| COM       | -         | (+) rail   | (-) rail on breadboard to positive (red) |
 
 ## AWS CLI Setup
 
@@ -92,4 +125,16 @@ mos wifi <WIFI-SSID> <WIFI-PASSWORD>
 4. AWS IoT Setup:
 ```bash
 mos aws-iot-setup
+```
+
+### Testing Device
+
+1. Stepper motor:
+```
+mos --port [port-number] call Turn '{"steps": 2038}'
+```
+
+2. Water pump:
+```
+mos --port [port-number] call Pump '{"time": 10}'
 ```
