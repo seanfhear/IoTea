@@ -7,6 +7,8 @@ load('api_adc.js');
 load('api_dht.js');
 load('stepper.js');
 load('api_rpc.js');
+load('api_events.js');
+load('api_aws.js');
 
 // Pins
 let sPin1 = 14, sPin2 = 27, sPin3 = 26, sPin4 = 25;
@@ -53,9 +55,23 @@ let mLevels = 4095;
 let dht = DHT.create(dhtPin, DHT.DHT11);
 ADC.enable(mPin);
 
+if(AWS.isConnected()){
+	print("AWS connected")
+} else{
+	print("AWS not connected")
+}
+
+Event.on(Event.CLOUD_CONNECTED, function() {
+	print("Connected to the cloud")
+}, null);
+
+Event.on(Event.CLOUD_DISCONNECTED, function() {
+  print("Not connected to the cloud")
+}, null);
+
 Timer.set(10000, true, function() {
 	let moisturePer = 100.00 - ((ADC.read(mPin) / mLevels) * 100.00);
-	let message = JSON.stringify({ 
+	let message = JSON.stringify({
 		'deviceID': Cfg.get('device.id'),
 		'temperature': dht.getTemp(),
 		'humidity' : dht.getHumidity(),
