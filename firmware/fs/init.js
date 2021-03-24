@@ -53,9 +53,18 @@ let mLevels = 4095;
 let dht = DHT.create(dhtPin, DHT.DHT11);
 ADC.enable(mPin);
 
+RPC.addHandler('Beat', function() {
+	let moisturePer = 100.00 - ((ADC.read(mPin) / mLevels) * 100.00);
+	return {
+		temperature: dht.getTemp(),
+		humidity: dht.getHumidity(),
+		moisturePer: moisturePer,
+	};
+});
+
 Timer.set(10000, true, function() {
 	let moisturePer = 100.00 - ((ADC.read(mPin) / mLevels) * 100.00);
-	let message = JSON.stringify({ 
+	let message = JSON.stringify({
 		'deviceID': Cfg.get('device.id'),
 		'temperature': dht.getTemp(),
 		'humidity' : dht.getHumidity(),
