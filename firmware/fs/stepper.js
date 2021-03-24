@@ -4,8 +4,11 @@ load('api_timer.js');
 let stepsLeft = 0;
 let stepNumber = 0;
 let timer = null;
+let direction = 1;
 
 let pin1, pin2, pin3, pin4;
+
+let abs = ffi('int abs(int)');
 
 let stepMotor = function(thisStep) {
   if (thisStep === 0) { // 0001
@@ -68,15 +71,30 @@ let Stepper = {
     this.step_delay = 60 * 1000 / this.number_of_steps / speed;
   },
   step: function(stepsToMove) {
-    stepsLeft = stepsToMove;
-    stepNumber = 0;
+    stepsLeft = abs(stepsToMove);
+
+    // Determine the direction
+    direction = 1;
+    if (stepsToMove < 0) {
+      direction = 0;
+    }
+
+    if (direction === 1) {
+      stepNumber = 0;
+    } else if (direction === 0) {
+      stepNumber = stepsLeft;
+    }
 
     stepMotor(stepNumber % 4);
 
     timer = Timer.set(this.step_delay, Timer.REPEAT, function() {
       if (stepsLeft > 0) {
         // Step the motor.
-        stepNumber++;
+        if (direction === 1) {
+          stepNumber++;
+        } else if (direction === 0) {
+          stepNumber--;
+        }
         stepMotor(stepNumber % 8);
         stepsLeft--;
       } else {
