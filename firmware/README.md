@@ -107,34 +107,26 @@ aws iot list-things
 
 ## Device Setup
 
-1. Build:
+1. Set your Plant ID
+
+Edit mos.yml with your plant ID.
+
+2. Build:
 ```bash
 mos build --platform esp32
 ```
 
-2. Flash:
+3. Flash:
 ```bash
 mos flash
 ```
 
-3. Wifi Setup:
+4. Wifi Setup:
 ```bash
 mos wifi <WIFI-SSID> <WIFI-PASSWORD>
 ```
 
-4. AWS IoT Setup:
+5. AWS IoT Setup:
 ```bash
 mos aws-iot-setup
-```
-
-### Testing Device
-
-1. Stepper motor:
-```
-mos --port [port-number] call Turn '{"steps": 2038}'
-```
-
-2. Water pump:
-```
-mos --port [port-number] call Pump '{"time": 10}'
 ```
