@@ -45,8 +45,10 @@ filesystem:
 # config_schema:
 #  - ["debug.level", 3]
 
+# TODO: Insert your plant_id into the empty string
 config_schema:
   - ["app", "o", { title: "My app custom settings" }]
+  - ["app.plant_id", "s", "", {title: "Plant Identifier"}]
   - ["i2c.enable", true]
 
 libs:
