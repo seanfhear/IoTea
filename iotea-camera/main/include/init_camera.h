@@ -48,7 +48,7 @@ extern "C"
 {
 #endif
 
-  void app_camera_main();
+  void init_camera();
 
 #ifdef __cplusplus
 }

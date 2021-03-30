@@ -22,12 +22,12 @@
 #include "esp_log.h"
 #include "driver/ledc.h"
 #include "esp_camera.h"
-#include "app_camera.h"
+#include "init_camera.h"
 #include "sdkconfig.h"
 
-static const char *TAG = "app_camera";
+static const char *TAG = "init_camera";
 
-void app_camera_main()
+void init_camera()
 {
   /* IO13, IO14 is designed for JTAG by default,
      * to use it as generalized input,
