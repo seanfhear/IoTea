@@ -1,0 +1,17 @@
+service: automation
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  stage: dev
+  region: eu-west-1
+
+functions:
+  request_all_vitals:
+    handler: handler.request_all_vitals
+    events:
+      - schedule: rate(30 minutes)
+  water_threshold:
+    handler: handler.water_threshold
