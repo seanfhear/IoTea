@@ -1,0 +1,18 @@
+service: lambda
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  stage: dev
+  region: eu-west-1
+
+functions:
+  handle_message:
+    handler: handler.handle_image
+    events:
+      - httpApi:
+          path: /bot-url
+          method: post
+

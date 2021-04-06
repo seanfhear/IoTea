@@ -2,3 +2,4 @@
 images/
 src/.ipynb_checkpoints/
 src/results.json
+lambda/vendored/
