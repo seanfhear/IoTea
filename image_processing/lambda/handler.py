@@ -99,7 +99,6 @@ def is_plant_leaning(img, threshold=0.05):
 
     left_percent = (left_half_count / (left_half_count + right_half_count))
     right_percent = 1 - left_percent
-    print('Left Percentage: {:.2%} Right Percentage: {:.2%}'.format(left_percent, right_percent))
 
     return abs(left_percent - right_percent) > threshold
 
@@ -107,6 +106,7 @@ def is_plant_leaning(img, threshold=0.05):
 def convert_to_image(byte_array):
     # TODO Convert image sent over MQTT to actual image
     return None
+
 
 def handle_image(event, context):
     if not event['image']:
@@ -135,6 +135,7 @@ def handle_image(event, context):
         qos=1,
         payload=json.dumps({"category":"turn", "value": 2038})
     )
+
     return {
         'statusCode': 200,
         'body': response
