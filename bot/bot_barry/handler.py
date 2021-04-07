@@ -2,7 +2,6 @@ import json
 import os
 import sys
 import boto3
-import botocore
 from boto3.dynamodb.conditions import Key, Attr
 from datetime import datetime
 
@@ -14,7 +13,7 @@ import requests
 TOKEN = os.environ['TELEGRAM_TOKEN']
 BASE_URL = "https://api.telegram.org/bot{}".format(TOKEN)
 
-DEVICE_ID = "optiplex_790_MTea"
+DEVICE_ID = "barry_jr"
 
 START_COMMAND = "/start"
 STATUS_COMMAND = "/status"
@@ -26,12 +25,11 @@ def handle_message(event, _):
         data = json.loads(event["body"])
         message = str(data["message"]["text"])
         chat_id = data["message"]["chat"]["id"]
-        first_name = data["message"]["chat"]["first_name"]
         user_id = str(data["message"]["from"]["id"])
 
         if is_user_verified(user_id):
             if message == START_COMMAND:
-                handle_start(chat_id, first_name)
+                handle_start(chat_id)
 
             if message == STATUS_COMMAND:
                 handle_status(chat_id)
@@ -47,8 +45,8 @@ def handle_message(event, _):
     return {"statusCode": 200}
 
 
-def handle_start(chat_id, first_name):
-    response = "Hello {}".format(first_name)
+def handle_start(chat_id):
+    response = "Hello"
     data = {"text": response.encode("utf8"), "chat_id": chat_id}
     url = BASE_URL + "/sendMessage"
     requests.post(url, data)
@@ -72,9 +70,9 @@ def handle_status(chat_id):
 
     response = "Hello!\n" \
                "My last checkup was at {time}\n" \
-               "Moisture Level: {moisture}\n" \
-               "Temperature: {temp}\n" \
-               "Humidity: {humidity}".format(
+               "Moisture Level: {moisture}%\n" \
+               "Temperature: {temp}\N{DEGREE SIGN}C\n" \
+               "Humidity: {humidity}%".format(
                     time=time,
                     moisture=moisture,
                     temp=temp,
@@ -101,5 +99,5 @@ def handle_invalid_user(chat_id):
 
 
 def is_user_verified(user_id):
-    whitelist = ["1616675858"]
+    whitelist = ["1616675858", "828939646"]
     return user_id in whitelist
