@@ -7,26 +7,26 @@
 
 #### Follow the steps below to create a bot and deploy it to AWS Lambda
 
-1. Open handler.py and edit the ``DEVICE_ID`` value and the ``WHITELIST`` value as appropriate. Only whitelisted accounts will be able to issue commands to the bot.
-2. Open serverless.yml and replace the ``service`` value with ```bot-{PlantID}```
+1. Open ``src/handler.py`` and edit the ``DEVICE_ID`` value and the ``WHITELIST`` value as appropriate. Only whitelisted accounts will be able to issue commands to the bot.
+2. Open ``src/serverless.yml`` and replace the ``service`` value with ```bot-{PlantID}```
 
     Example:
 
     ```service: bot-yoshi```
 
-3. In serverless.yml, replace functions -> handle_message -> events -> httpApi -> path with ```/bot-{PlantID}```
+3. In ``src/serverless.yml``, replace functions -> handle_message -> events -> httpApi -> path with ```/bot-{PlantID}```
 
     Example:
 
     ```
-         functions: 
-            handle_message:
-                events:
-                    httpApi:
-                        path: /bot-yoshi
+    functions: 
+        handle_message:
+            events:
+                httpApi:
+                    path: /bot-yoshi
     ```
 
-4. Install the bot's requirements into a ``vendored`` directory that can be accessed by the Lambda function.
+4. In the `src` directory, install the bot's requirements into a ``vendored`` directory that can be accessed by the Lambda function.
 
     ```pip install -r requirements.txt -t vendored```
 
@@ -38,7 +38,7 @@
    export TELEGRAM_TOKEN=YOUR_BOT_TOKEN
    ```
 
-7. Deploy the Lambda function and take note of the URL that you are given.
+7. Deploy the Lambda function from the ``src`` directory and take note of the URL that you are given.
 
     ```
    serverless deploy
