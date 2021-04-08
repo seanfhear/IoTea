@@ -1,11 +1,11 @@
-#Creating a Telegram Bot
+# Creating a Telegram Bot
 
 ### Prerequisites
 - Python3
 - ``npm serverless`` package
 - AWS account credentials with environment variables ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY`` correctly configured
 
-####Follow the steps below to create a bot and deploy it to AWS Lambda
+#### Follow the steps below to create a bot and deploy it to AWS Lambda
 
 1. Open handler.py and edit the ``DEVICE_ID`` value and the ``WHITELIST`` value as appropriate. Only whitelisted accounts will be able to issue commands to the bot.
 2. Open serverless.yml and replace the ``service`` value with ```bot-{PlantID}```
