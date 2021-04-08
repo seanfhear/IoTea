@@ -54,6 +54,13 @@ let stepMotor = function(thisStep) {
   }
 };
 
+let cutPower = function() {
+  GPIO.write(pin1, false);
+  GPIO.write(pin2, false);
+  GPIO.write(pin3, false);
+  GPIO.write(pin4, false);
+};
+
 let Stepper = {
   init: function(steps, p1, p2, p3, p4) {
     this.number_of_steps = steps;
@@ -100,6 +107,7 @@ let Stepper = {
       } else {
         stepNumber = 0;
         Timer.del(timer);
+        cutPower();
       }
     }, null);
   },
