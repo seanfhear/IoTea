@@ -12,12 +12,14 @@ import requests
 
 TOKEN = os.environ['TELEGRAM_TOKEN']
 BASE_URL = "https://api.telegram.org/bot{}".format(TOKEN)
-
-DEVICE_ID = "barry_jr"
+SEND_MESSAGE_URL = "/sendMessage"
 
 START_COMMAND = "/start"
 STATUS_COMMAND = "/status"
 PHOTO_COMMAND = "/photo"
+
+DEVICE_ID = ""  # Enter your plantId here e.g. "yoshi"
+WHITELIST = []  # Enter the list of Telegram IDs to whitelist here as comma separated strings e.g. ["123", "456"]
 
 
 def handle_message(event, _):
@@ -48,7 +50,7 @@ def handle_message(event, _):
 def handle_start(chat_id):
     response = "Hello"
     data = {"text": response.encode("utf8"), "chat_id": chat_id}
-    url = BASE_URL + "/sendMessage"
+    url = BASE_URL + SEND_MESSAGE_URL
     requests.post(url, data)
 
 
@@ -66,7 +68,7 @@ def handle_status(chat_id):
     humidity = item['humidity']
     temp = item['temperature']
     moisture = item['moisturePer']
-    time = datetime.utcfromtimestamp(float(str(item['ts'])[:10]))
+    time = datetime.utcfromtimestamp(timestamp_to_seconds(item['ts']))
 
     response = "Hello!\n" \
                "My last checkup was at {time}\n" \
@@ -80,24 +82,27 @@ def handle_status(chat_id):
                 )
 
     data = {"text": response.encode("utf8"), "chat_id": chat_id}
-    url = BASE_URL + "/sendMessage"
+    url = BASE_URL + SEND_MESSAGE_URL
     requests.post(url, data)
 
 
 def handle_photo(chat_id):
     response = "Sending photo of plant..."
     data = {"text": response.encode("utf8"), "chat_id": chat_id}
-    url = BASE_URL + "/sendMessage"
+    url = BASE_URL + SEND_MESSAGE_URL
     requests.post(url, data)
 
 
 def handle_invalid_user(chat_id):
     response = "Sorry, you are not a verified user!"
     data = {"text": response.encode("utf8"), "chat_id": chat_id}
-    url = BASE_URL + "/sendMessage"
+    url = BASE_URL + SEND_MESSAGE_URL
     requests.post(url, data)
 
 
 def is_user_verified(user_id):
-    whitelist = ["1616675858", "828939646"]
-    return user_id in whitelist
+    return user_id in WHITELIST
+
+
+def timestamp_to_seconds(ts):
+    return ts / 1000
