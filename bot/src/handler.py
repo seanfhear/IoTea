@@ -6,7 +6,7 @@ from boto3.dynamodb.conditions import Key, Attr
 from datetime import datetime
 
 here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, "../vendored"))
+sys.path.append(os.path.join(here, "vendored"))
 
 import requests
 
@@ -25,21 +25,31 @@ WHITELIST = []  # Enter the list of Telegram IDs to whitelist here as comma sepa
 def handle_message(event, _):
     try:
         data = json.loads(event["body"])
-        message = str(data["message"]["text"])
+        message = str(data["message"]["text"]).split("@")
         chat_id = data["message"]["chat"]["id"]
         user_id = str(data["message"]["from"]["id"])
 
-        if is_user_verified(user_id):
-            if message == START_COMMAND:
-                handle_start(chat_id)
-
-            if message == STATUS_COMMAND:
-                handle_status(chat_id)
-
-            if message == PHOTO_COMMAND:
-                handle_photo(chat_id)
+        is_relevant_msg = False
+        if len(message) > 1:
+            target = message[1][:-10]
+            if target == DEVICE_ID:
+                is_relevant_msg = True
         else:
-            handle_invalid_user(chat_id)
+            is_relevant_msg = True
+        message = message[0]
+
+        if is_relevant_msg:
+            if is_user_verified(user_id):
+                if message == START_COMMAND:
+                    handle_start(chat_id)
+
+                if message == STATUS_COMMAND:
+                    handle_status(chat_id)
+
+                if message == PHOTO_COMMAND:
+                    handle_photo(chat_id)
+            else:
+                handle_invalid_user(chat_id)
 
     except Exception as e:
         print(e)
