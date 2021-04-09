@@ -1,3 +1,4 @@
-.serverless/
-vendored/
+src/.serverless/
+src/vendored/
 .idea/
+tokens.txt
