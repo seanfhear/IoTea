@@ -119,9 +119,12 @@ def handle_photo(chat_id):
 
 
 def handle_water(chat_id, message):
-    if len(message) == 0:
+    response = ""
+    invalid_thresh = False
+
+    if len(message) == 1:
         response = "Getting water threshold..."
-    else:
+    elif len(message) == 2:
         try:
             thresh = int(message[1])
             if 0 <= thresh <= 100:
@@ -130,9 +133,14 @@ def handle_water(chat_id, message):
                     thresh=thresh
                 )
             else:
-                response = "Invalid threshold received."
+                invalid_thresh = True
         except ValueError:
-            response = "Invalid threshold received."
+            invalid_thresh = True
+    else:
+        invalid_thresh = True
+
+    if invalid_thresh:
+        response = "Invalid threshold received."
 
     data = {"text": response.encode("utf8"), "chat_id": chat_id}
     url = BASE_URL + SEND_MESSAGE_URL
