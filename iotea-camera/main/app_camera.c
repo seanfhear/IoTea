@@ -1,6 +1,8 @@
+#include <assert.h>
 #include "app_camera.h"
 #include "driver/ledc.h"
 #include "esp_log.h"
+#include "mbedtls/base64.h"
 
 static const char *TAG = "app_camera";
 
@@ -38,19 +40,19 @@ esp_err_t initialize_camera()
       .pin_href = CAM_PIN_HREF,
       .pin_pclk = CAM_PIN_PCLK,
 
-      //XCLK 20MHz or 10MHz for OV2640 double FPS (Experimental)
+      // XCLK 20MHz or 10MHz for OV2640 double FPS (Experimental)
       .xclk_freq_hz = 20000000,
       .ledc_timer = LEDC_TIMER_0,
       .ledc_channel = LEDC_CHANNEL_0,
 
-      .pixel_format = PIXFORMAT_JPEG, //YUV422,GRAYSCALE,RGB565,JPEG
-      .frame_size = FRAMESIZE_QSXGA,  //QQVGA-QXGA Do not use sizes above QVGA when not JPEG
+      .pixel_format = PIXFORMAT_JPEG, // YUV422,GRAYSCALE,RGB565,JPEG
+      .frame_size = FRAMESIZE_QSXGA,  // QQVGA-QXGA Do not use sizes above QVGA when not JPEG
 
-      .jpeg_quality = 10, //0-63 lower number means higher quality
-      .fb_count = 2       //if more than one, i2s runs in continuous mode. Use only with JPEG
+      .jpeg_quality = 10, // 0-63 lower number means higher quality
+      .fb_count = 2       // if more than one, i2s runs in continuous mode. Use only with JPEG
   };
 
-  //initialize the camera
+  // Initialize the camera
   esp_err_t err = esp_camera_init(&camera_config);
   if (err != ESP_OK)
   {
@@ -58,14 +60,37 @@ esp_err_t initialize_camera()
     return err;
   }
 
+  // See https://randomnerdtutorials.com/esp32-cam-ov2640-camera-settings for we can change for this sensor.
   sensor_t *s = esp_camera_sensor_get();
-  s->set_vflip(s, 1); //flip it back
-  //initial sensors are flipped vertically and colors are a bit saturated
-  if (s->id.PID == OV3660_PID)
+  s->set_vflip(s, 1);
+
+  return ESP_OK;
+}
+
+esp_err_t camera_capture(uint8_t **img, size_t img_buff_size)
+{
+  assert(img != NULL);
+
+  camera_fb_t *fb = esp_camera_fb_get();
+  if (!fb)
   {
-    s->set_brightness(s, 1);  //up the blightness just a bit
-    s->set_saturation(s, -2); //lower the saturation
+    ESP_LOGE(TAG, "Camera Capture Failed");
+    return ESP_FAIL;
   }
 
+  *img = (uint8_t *)malloc(img_buff_size);
+  size_t olen;
+
+  int err = mbedtls_base64_encode(*img, img_buff_size, &olen, fb->buf, fb->len);
+  if (err != 0)
+  {
+    ESP_LOGE(TAG, "mbed_tls: Failed to encode image as base64");
+    ESP_LOGE(TAG, "Buffer size needed for base64 encoding = %d \n", olen);
+    ESP_LOGE(TAG, "Buffer size allocated = %d \n", img_buff_size);
+
+    return ESP_FAIL;
+  }
+
+  esp_camera_fb_return(fb);
   return ESP_OK;
 }
