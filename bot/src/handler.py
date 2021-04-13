@@ -26,37 +26,45 @@ WHITELIST = []  # Enter the list of Telegram IDs to whitelist here as comma sepa
 def handle_message(event, _):
     try:
         data = json.loads(event["body"])
-        message = str(data["message"]["text"]).split("@")
         chat_id = data["message"]["chat"]["id"]
         user_id = str(data["message"]["from"]["id"])
 
+        message = str(data["message"]["text"]).split(" ")
+        command = message[0].split("@")
+
         is_relevant_msg = False
-        if len(message) > 1:
-            target = message[1][:-10]
+        if len(command) > 1:
+            target = command[1][:-10]
             if target == DEVICE_ID:
                 is_relevant_msg = True
         else:
             is_relevant_msg = True
-        message = message[0]
+        command = command[0]
 
         if is_relevant_msg:
-            if message == START_COMMAND:
+            if command == START_COMMAND:
                 if is_user_verified(user_id):
                     handle_start(chat_id)
                 else:
                     handle_invalid_user(chat_id, START_COMMAND)
 
-            if message == STATUS_COMMAND:
+            if command == STATUS_COMMAND:
                 if is_user_verified(user_id):
                     handle_status(chat_id)
                 else:
                     handle_invalid_user(chat_id, STATUS_COMMAND)
 
-            if message == PHOTO_COMMAND:
+            if command == PHOTO_COMMAND:
                 if is_user_verified(user_id):
                     handle_photo(chat_id)
                 else:
                     handle_invalid_user(chat_id, PHOTO_COMMAND)
+
+            if command == WATER_COMMAND:
+                if is_user_verified(user_id):
+                    handle_water(chat_id, message)
+                else:
+                    handle_invalid_user(chat_id, WATER_COMMAND)
 
     except Exception as e:
         print(e)
@@ -110,8 +118,25 @@ def handle_photo(chat_id):
     requests.post(url, data)
 
 
-def handle_water(message, chat_id):
-    pass
+def handle_water(chat_id, message):
+    if len(message) == 0:
+        response = "Getting water threshold..."
+    else:
+        try:
+            thresh = int(message[1])
+            if 0 <= thresh <= 100:
+                response = "Setting threshold for {plant} to {thresh}%".format(
+                    plant=DEVICE_ID,
+                    thresh=thresh
+                )
+            else:
+                response = "Invalid threshold received."
+        except ValueError:
+            response = "Invalid threshold received."
+
+    data = {"text": response.encode("utf8"), "chat_id": chat_id}
+    url = BASE_URL + SEND_MESSAGE_URL
+    requests.post(url, data)
 
 
 def handle_invalid_user(chat_id, command):
