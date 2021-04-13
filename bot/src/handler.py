@@ -122,15 +122,35 @@ def handle_water(chat_id, message):
     response = ""
     invalid_thresh = False
 
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('iotea_thresholds')
+
+    res = table.query(
+        Limit=1,
+        ScanIndexForward=False,
+        KeyConditionExpression=Key('plant_id').eq(DEVICE_ID)
+    )
+    current_thresh = res['Items'][0]['threshold']
+
     if len(message) == 1:
-        response = "Getting water threshold..."
+        response = "The threshold for {plant} is currently {thresh}%".format(
+                    plant=DEVICE_ID,
+                    thresh=current_thresh
+                )
     elif len(message) == 2:
         try:
-            thresh = int(message[1])
-            if 0 <= thresh <= 100:
-                response = "Setting threshold for {plant} to {thresh}%".format(
+            new_thresh = int(message[1])
+            if 0 <= new_thresh <= 100:
+                table.update_item(
+                    Key={'plant_id': DEVICE_ID},
+                    UpdateExpression="set threshold = :r",
+                    ExpressionAttributeValues={':r': new_thresh}
+                )
+
+                response = "The threshold for {plant} has been changed from {current_thresh}% to {new_thresh}%".format(
                     plant=DEVICE_ID,
-                    thresh=thresh
+                    current_thresh=current_thresh,
+                    new_thresh=new_thresh
                 )
             else:
                 invalid_thresh = True
