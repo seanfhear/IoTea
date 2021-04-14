@@ -13,16 +13,18 @@ Once this is completed run the following commands ensuring the board is connecte
 
 1. Run `idf.py set-target esp32` This only needs to be run once after cloning
 2. Run `idf.py menuconfig` To set the config options for the project. 
-    1. **Enable WiFi:** Navigate into the **IoTea Camera** menu.
-    ![IoTea Camera menu item in menuconfig](./images/IoTea-menu-item.png)
-    Enter your WiFi settings (SSID and password) to allow the board to access the internet.
-    ![Wifi settings menu](./images/Wifi-Settings.png)
-    2. **Enable PSRAM:** Navigate into the **Component config** menu.
-    ![Component config menu](./images/Component-config-menu.png)
-    Navigate into the **ESP32 specific** menu.
-    ![ESP32 specific menu](./images/ESP32-Specific-menu.png)
-    Enable **Support for external, SPI-connected RAM**.
-    ![Enable PSRAM](./images/Enable-PSRAM.png)
+    1. **Enable WiFi:** 
+        * Navigate into the **IoTea Camera** menu.
+        ![IoTea Camera menu item in menuconfig](./images/IoTea-menu-item.png)
+        * Enter your WiFi settings (SSID and password) to allow the board to access the internet.
+        ![Wifi settings menu](./images/Wifi-Settings.png)
+    2. **Enable PSRAM:** 
+        * Navigate into the **Component config** menu.
+        ![Component config menu](./images/Component-config-menu.png)
+        * Navigate into the **ESP32 specific** menu.
+        ![ESP32 specific menu](./images/ESP32-Specific-menu.png)
+        * Enable **Support for external, SPI-connected RAM**.
+          ![Enable PSRAM](./images/Enable-PSRAM.png)
 3. Run `idf.py build` to build the whole project and required components.
 4. Run `idf.py -p PORT flash` to flash the build project onto the board. Replace PORT with the serial port the board is connected to. The serial ports will have the following patterns in their names:
     * Windows: names like `COM1`
