@@ -67,7 +67,7 @@ esp_err_t initialize_camera()
   return ESP_OK;
 }
 
-esp_err_t camera_capture(uint8_t **img, size_t img_buff_size)
+esp_err_t get_base64_image(uint8_t **img, size_t img_buff_size)
 {
   assert(img != NULL);
 

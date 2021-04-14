@@ -17,7 +17,7 @@ void app_main(void)
     // Initially used (2560 * 1920) * sizeof(char) but this is way overkill.
     size_t img_buff_size = 100000;
 
-    err = camera_capture(&img, img_buff_size);
+    err = get_base64_image(&img, img_buff_size);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "Camera capture failed");
