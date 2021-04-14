@@ -25,13 +25,13 @@ Once this is completed run the following commands ensuring the board is connecte
         ![ESP32 specific menu](./images/ESP32-Specific-menu.png)
         * Enable **Support for external, SPI-connected RAM**.
           ![Enable PSRAM](./images/Enable-PSRAM.png)
-3. Run `idf.py build` to build the whole project and required components.
+3. Run `idf.py build` to build the entire project and required components.
 4. Run `idf.py -p PORT flash` to flash the build project onto the board. Replace PORT with the serial port the board is connected to. The serial ports will have the following patterns in their names:
     * Windows: names like `COM1`
     * Linux: starting with `/dev/tty`
     * macOS: starting with `/dev/cu`
 5. To monitor the board while connected run `idf.py -p PORT monitor`
 
-Once you have successfully built the entire project you can specifically rebuild just the app by running `idf.py app` the corresponding flash command is `idf.py -p PORT app-flash`
+Once you have successfully built the entire project you can specifically rebuild just the app by running `idf.py app`. The corresponding flash command is `idf.py -p PORT app-flash`
 
 You can chain commands by adding multiple arguments to `idf.py` for example to flash and then monitor the app you could run `idf.py -p PORT flash monitor`
