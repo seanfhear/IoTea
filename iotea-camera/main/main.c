@@ -7,9 +7,7 @@ void app_main(void)
 {
     esp_err_t err = initialize_camera();
     if (err != ESP_OK)
-    {
         ESP_LOGE(TAG, "Camera init failed");
-    }
 
     uint8_t *img;
     // TODO: Figure out a way to dynamically set an appropriate buffersize?
@@ -20,20 +18,12 @@ void app_main(void)
 
     err = get_base64_image(&img, img_buff_size, &olen);
     if (err != ESP_OK)
-    {
         ESP_LOGE(TAG, "Camera capture failed");
-    }
-
-    printf("%s: olen = %d\n", TAG, (int)olen);
 
     free(img);
 
     if (err != ESP_OK)
-    {
         ESP_LOGE(TAG, "Something broke :/");
-    }
     else
-    {
         ESP_LOGI(TAG, "Success!!");
-    }
 }
