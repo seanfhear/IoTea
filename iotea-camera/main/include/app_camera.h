@@ -24,6 +24,6 @@
 #define CAM_PIN_PCLK 25
 
 esp_err_t initialize_camera();
-esp_err_t get_base64_image(uint8_t **img, size_t img_buff_size);
+esp_err_t get_base64_image(uint8_t **img, size_t img_buff_size, size_t *olen);
 
 #endif

@@ -67,7 +67,7 @@ esp_err_t initialize_camera()
   return ESP_OK;
 }
 
-esp_err_t get_base64_image(uint8_t **img, size_t img_buff_size)
+esp_err_t get_base64_image(uint8_t **img, size_t img_buff_size, size_t *olen)
 {
   assert(img != NULL);
 
@@ -79,13 +79,12 @@ esp_err_t get_base64_image(uint8_t **img, size_t img_buff_size)
   }
 
   *img = (uint8_t *)malloc(img_buff_size);
-  size_t olen;
 
-  int err = mbedtls_base64_encode(*img, img_buff_size, &olen, fb->buf, fb->len);
+  int err = mbedtls_base64_encode(*img, img_buff_size, olen, fb->buf, fb->len);
   if (err != 0)
   {
     ESP_LOGE(TAG, "mbed_tls: Failed to encode image as base64");
-    ESP_LOGE(TAG, "Buffer size needed for base64 encoding = %d \n", olen);
+    ESP_LOGE(TAG, "Buffer size needed for base64 encoding = %d \n", *olen);
     ESP_LOGE(TAG, "Buffer size allocated = %d \n", img_buff_size);
 
     return ESP_FAIL;

@@ -16,12 +16,15 @@ void app_main(void)
     // Experimentally found 100,000 to be more than enough (usually used ~64,000 for encoded image).
     // Initially used (2560 * 1920) * sizeof(char) but this is way overkill.
     size_t img_buff_size = 100000;
+    size_t olen = 0;
 
-    err = get_base64_image(&img, img_buff_size);
+    err = get_base64_image(&img, img_buff_size, &olen);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "Camera capture failed");
     }
+
+    printf("%s: olen = %d\n", TAG, (int)olen);
 
     free(img);
 
