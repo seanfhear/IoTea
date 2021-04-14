@@ -1,6 +1,5 @@
 menu "IoTea Camera"
 
-menu "WiFi Settings"
 config ESP_WIFI_SSID
     string "WiFi SSID"
     default ""
@@ -12,6 +11,5 @@ config ESP_WIFI_PASSWORD
     default ""
     help
 	WiFi password (WPA or WPA2) for the ESP-EYE to use.
-endmenu
 
 endmenu
