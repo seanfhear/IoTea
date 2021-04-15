@@ -1,4 +1,5 @@
 #include "esp_log.h"
+#include "esp_err.h"
 #include "app_camera.h"
 #include "app_wifi.h"
 
@@ -6,11 +7,9 @@ static const char *TAG = "main";
 
 void app_main(void)
 {
-    initialize_wifi();
-    esp_err_t err;
-    // esp_err_t err = initialize_wifi();
-    // if (err != ESP_OK)
-    //     ESP_LOGE(TAG, "WiFi init failed with error 0x%x", err);
+    esp_err_t err = initialize_wifi();
+    if (err != ESP_OK)
+        ESP_LOGE(TAG, "WiFi init failed with error 0x%x", err);
 
     err = initialize_camera();
     if (err != ESP_OK)
@@ -29,8 +28,6 @@ void app_main(void)
 
     free(img);
 
-    if (err != ESP_OK)
-        ESP_LOGE(TAG, "Something broke :/");
-    else
-        ESP_LOGI(TAG, "Success!!");
+    // Ensure nothing is broken
+    ESP_ERROR_CHECK(err);
 }

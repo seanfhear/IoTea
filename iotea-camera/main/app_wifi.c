@@ -1,11 +1,3 @@
-/* WiFi station Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -19,15 +11,6 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-/* The examples use WiFi configuration that you can set via project configuration menu
-
-   If you'd rather not, just change the below entries to strings with
-   the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
-*/
-#define EXAMPLE_ESP_WIFI_SSID CONFIG_ESP_WIFI_SSID
-#define EXAMPLE_ESP_WIFI_PASS CONFIG_ESP_WIFI_PASSWORD
-#define EXAMPLE_ESP_MAXIMUM_RETRY CONFIG_ESP_MAXIMUM_RETRY
-
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
 
@@ -37,41 +20,37 @@ static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
 
-static const char *TAG = "wifi station";
+static const char *TAG = "app_wifi";
 
 static int s_retry_num = 0;
 
-static void event_handler(void *arg, esp_event_base_t event_base,
-                          int32_t event_id, void *event_data)
+static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
   if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START)
-  {
     esp_wifi_connect();
-  }
   else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
   {
-    if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
+    if (s_retry_num < CONFIG_ESP_MAXIMUM_RETRY)
     {
       esp_wifi_connect();
       s_retry_num++;
       ESP_LOGI(TAG, "retry to connect to the AP");
     }
     else
-    {
       xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
-    }
-    ESP_LOGI(TAG, "connect to the AP fail");
+
+    ESP_LOGE(TAG, "Failed to connect to the network");
   }
   else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
   {
     ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
-    ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+    ESP_LOGI(TAG, "Connected and got ip:" IPSTR, IP2STR(&event->ip_info.ip));
     s_retry_num = 0;
     xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
   }
 }
 
-void wifi_init_sta(void)
+esp_err_t wifi_init_sta(void)
 {
   s_wifi_event_group = xEventGroupCreate();
 
@@ -98,11 +77,8 @@ void wifi_init_sta(void)
 
   wifi_config_t wifi_config = {
       .sta = {
-          .ssid = EXAMPLE_ESP_WIFI_SSID,
-          .password = EXAMPLE_ESP_WIFI_PASS,
-          /* Setting a password implies station will connect to all security modes including WEP/WPA.
-             * However these modes are deprecated and not advisable to be used. Incase your Access point
-             * doesn't support WPA2, these mode can be enabled by commenting below line */
+          .ssid = CONFIG_ESP_WIFI_SSID,
+          .password = CONFIG_ESP_WIFI_PASSWORD,
           .threshold.authmode = WIFI_AUTH_WPA2_PSK,
 
           .pmf_cfg = {
@@ -126,30 +102,28 @@ void wifi_init_sta(void)
 
   /* xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
      * happened. */
+  esp_err_t ret = ESP_OK;
   if (bits & WIFI_CONNECTED_BIT)
-  {
-    ESP_LOGI(TAG, "connected to ap SSID:%s password:%s",
-             EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
-  }
+    ESP_LOGI(TAG, "Connected to network SSID:%s", CONFIG_ESP_WIFI_SSID);
   else if (bits & WIFI_FAIL_BIT)
   {
-    ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
-             EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
+    ret = ESP_FAIL;
+    ESP_LOGE(TAG, "Failed to connect to network SSID:%s Ensure the config values are correct.", CONFIG_ESP_WIFI_SSID);
   }
   else
-  {
     ESP_LOGE(TAG, "UNEXPECTED EVENT");
-  }
 
   /* The event will not be processed after unregister */
   ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip));
   ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id));
   vEventGroupDelete(s_wifi_event_group);
+
+  return ret;
 }
 
-void initialize_wifi()
+esp_err_t initialize_wifi()
 {
-  //Initialize NVS
+  // Initialize NVS
   esp_err_t ret = nvs_flash_init();
   if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
   {
@@ -159,5 +133,7 @@ void initialize_wifi()
   ESP_ERROR_CHECK(ret);
 
   ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
-  wifi_init_sta();
+  ret = wifi_init_sta();
+
+  return ret;
 }
