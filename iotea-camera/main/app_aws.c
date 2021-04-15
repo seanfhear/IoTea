@@ -1,27 +1,12 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <limits.h>
 #include <string.h>
 
 #include "app_aws.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
 #include "esp_log.h"
-#include "driver/sdmmc_host.h"
-
-#include "nvs.h"
-#include "nvs_flash.h"
 
 #include "aws_iot_config.h"
-#include "aws_iot_log.h"
-#include "aws_iot_version.h"
 #include "aws_iot_mqtt_client_interface.h"
 
 static const char *TAG = "app_aws";
@@ -67,8 +52,6 @@ esp_err_t aws_mqtt_init(AWS_IoT_Client *client)
 {
   // Set AWS Client initialization parameters
   IoT_Client_Init_Params mqttInitParams = iotClientInitParamsDefault;
-
-  ESP_LOGI(TAG, "AWS IoT SDK Version %d.%d.%d-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_TAG);
 
   mqttInitParams.enableAutoReconnect = false; // We enable this later below
   mqttInitParams.pHostURL = HostAddress;
