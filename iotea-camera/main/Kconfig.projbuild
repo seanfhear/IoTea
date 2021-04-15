@@ -18,4 +18,16 @@ config ESP_MAXIMUM_RETRY
     help
     Set the maximum retries for trying to connect to the WiFi.
 
+config AWS_IOT_THING_NAME
+    string "AWS IoT Thing Name"
+    default "ESP-EYE_name"
+    help
+        AWS IoT Thing Name
+
+config AWS_IOT_CLIENT_ID
+    string "AWS IoT Client ID"
+    default ""
+    help
+        AWS IoT Client Name
+
 endmenu
