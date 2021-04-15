@@ -12,6 +12,12 @@ void app_main(void)
     if (err != ESP_OK)
         ESP_LOGE(TAG, "WiFi init failed with error 0x%x", err);
 
+    // WiFi needs to be connected for MQTT to work
+    assert(err == ESP_OK);
+    err = start_mqtt();
+    if (err != ESP_OK)
+        ESP_LOGE(TAG, "AWS MQTT failed to start");
+
     err = initialize_camera();
     if (err != ESP_OK)
         ESP_LOGE(TAG, "Camera init failed with error 0x%x", err);
@@ -28,8 +34,6 @@ void app_main(void)
         ESP_LOGE(TAG, "Camera capture failed");
 
     free(img);
-
-    start_mqtt();
 
     // Ensure nothing is broken
     ESP_ERROR_CHECK(err);

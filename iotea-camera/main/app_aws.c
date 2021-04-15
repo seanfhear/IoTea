@@ -70,20 +70,10 @@ void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data)
   }
 }
 
-void aws_iot_task(void *param)
+esp_err_t aws_mqtt_init(AWS_IoT_Client *client)
 {
-  char cPayload[100];
-
-  int32_t i = 0;
-
-  IoT_Error_t rc = FAILURE;
-
-  AWS_IoT_Client client;
   IoT_Client_Init_Params mqttInitParams = iotClientInitParamsDefault;
   IoT_Client_Connect_Params connectParams = iotClientConnectParamsDefault;
-
-  IoT_Publish_Message_Params paramsQOS0;
-  IoT_Publish_Message_Params paramsQOS1;
 
   ESP_LOGI(TAG, "AWS IoT SDK Version %d.%d.%d-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_TAG);
 
@@ -101,11 +91,11 @@ void aws_iot_task(void *param)
   mqttInitParams.disconnectHandler = disconnectCallbackHandler;
   mqttInitParams.disconnectHandlerData = NULL;
 
-  rc = aws_iot_mqtt_init(&client, &mqttInitParams);
+  IoT_Error_t rc = aws_iot_mqtt_init(client, &mqttInitParams);
   if (SUCCESS != rc)
   {
     ESP_LOGE(TAG, "aws_iot_mqtt_init returned error : %d ", rc);
-    abort();
+    return ESP_FAIL;
   }
 
   connectParams.keepAliveIntervalInSec = 10;
@@ -118,7 +108,7 @@ void aws_iot_task(void *param)
   ESP_LOGI(TAG, "Connecting to AWS...");
   do
   {
-    rc = aws_iot_mqtt_connect(&client, &connectParams);
+    rc = aws_iot_mqtt_connect(client, &connectParams);
     if (SUCCESS != rc)
     {
       ESP_LOGE(TAG, "Error(%d) connecting to %s:%d", rc, mqttInitParams.pHostURL, mqttInitParams.port);
@@ -126,12 +116,20 @@ void aws_iot_task(void *param)
     }
   } while (SUCCESS != rc);
 
-  rc = aws_iot_mqtt_autoreconnect_set_status(&client, true);
+  rc = aws_iot_mqtt_autoreconnect_set_status(client, true);
   if (SUCCESS != rc)
   {
     ESP_LOGE(TAG, "Unable to set Auto Reconnect to true - %d", rc);
-    abort();
+    return ESP_FAIL;
   }
+
+  return ESP_OK;
+}
+
+void aws_task(void *param)
+{
+  AWS_IoT_Client client;
+  ESP_ERROR_CHECK(aws_mqtt_init(&client));
 
   char topic_name[100];
   sprintf(topic_name, "IoTea/%s/trigger", CONFIG_PLANT_NAME);
@@ -139,48 +137,23 @@ void aws_iot_task(void *param)
   const char *TOPIC = (const char *)&topic_name;
   const int TOPIC_LEN = strlen(TOPIC);
 
-  ESP_LOGI(TAG, "Subscribing...");
-  rc = aws_iot_mqtt_subscribe(&client, TOPIC, TOPIC_LEN, QOS0, iot_subscribe_callback_handler, NULL);
+  ESP_LOGI(TAG, "Subscribing to %s", TOPIC);
+  IoT_Error_t rc = aws_iot_mqtt_subscribe(&client, TOPIC, TOPIC_LEN, QOS0, iot_subscribe_callback_handler, NULL);
   if (SUCCESS != rc)
   {
     ESP_LOGE(TAG, "Error subscribing : %d ", rc);
     abort();
   }
-
-  sprintf(cPayload, "%s : %d ", "hello from SDK", i);
-
-  paramsQOS0.qos = QOS0;
-  paramsQOS0.payload = (void *)cPayload;
-  paramsQOS0.isRetained = 0;
-
-  paramsQOS1.qos = QOS1;
-  paramsQOS1.payload = (void *)cPayload;
-  paramsQOS1.isRetained = 0;
+  ESP_LOGI(TAG, "Successfully subscribed to topic");
 
   while ((NETWORK_ATTEMPTING_RECONNECT == rc || NETWORK_RECONNECTED == rc || SUCCESS == rc))
   {
-
     //Max time the yield function will wait for read messages
     rc = aws_iot_mqtt_yield(&client, 100);
     if (NETWORK_ATTEMPTING_RECONNECT == rc)
     {
       // If the client is attempting to reconnect we will skip the rest of the loop.
       continue;
-    }
-
-    ESP_LOGI(TAG, "Stack remaining for task '%s' is %d bytes", pcTaskGetTaskName(NULL), uxTaskGetStackHighWaterMark(NULL));
-    vTaskDelay(1000 / portTICK_RATE_MS);
-    sprintf(cPayload, "%s : %d ", "hello from ESP32 (QOS0)", i++);
-    paramsQOS0.payloadLen = strlen(cPayload);
-    rc = aws_iot_mqtt_publish(&client, TOPIC, TOPIC_LEN, &paramsQOS0);
-
-    sprintf(cPayload, "%s : %d ", "hello from ESP32 (QOS1)", i++);
-    paramsQOS1.payloadLen = strlen(cPayload);
-    rc = aws_iot_mqtt_publish(&client, TOPIC, TOPIC_LEN, &paramsQOS1);
-    if (rc == MQTT_REQUEST_TIMEOUT_ERROR)
-    {
-      ESP_LOGW(TAG, "QOS1 publish ack not received.");
-      rc = SUCCESS;
     }
   }
 
@@ -190,7 +163,6 @@ void aws_iot_task(void *param)
 
 esp_err_t start_mqtt()
 {
-  // WiFi needs to be initialized
-  xTaskCreatePinnedToCore(&aws_iot_task, "aws_iot_task", 9216, NULL, 5, NULL, 1);
+  xTaskCreatePinnedToCore(&aws_task, "aws_task", 9216, NULL, 5, NULL, 1);
   return ESP_OK;
 }
