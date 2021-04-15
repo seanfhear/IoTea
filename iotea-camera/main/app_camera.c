@@ -46,10 +46,10 @@ esp_err_t initialize_camera()
       .ledc_channel = LEDC_CHANNEL_0,
 
       .pixel_format = PIXFORMAT_JPEG, // YUV422,GRAYSCALE,RGB565,JPEG
-      .frame_size = FRAMESIZE_QSXGA,  // QQVGA-QXGA Do not use sizes above QVGA when not JPEG
+      .frame_size = FRAMESIZE_QXGA,   // QQVGA-QXGA Do not use sizes above QVGA when not JPEG
 
       .jpeg_quality = 10, // 0-63 lower number means higher quality
-      .fb_count = 2       // if more than one, i2s runs in continuous mode. Use only with JPEG
+      .fb_count = 1       // if more than one, i2s runs in continuous mode. Use only with JPEG
   };
 
   // Initialize the camera
@@ -80,10 +80,12 @@ esp_err_t get_base64_image(uint8_t **img, size_t img_buff_size, size_t *olen)
 
   *img = (uint8_t *)malloc(img_buff_size);
 
+  assert(*img != NULL);
+
   int err = mbedtls_base64_encode(*img, img_buff_size, olen, fb->buf, fb->len);
   if (err != 0)
   {
-    ESP_LOGE(TAG, "mbed_tls: Failed to encode image as base64");
+    ESP_LOGE(TAG, "mbed_tls: Failed to encode image as base64 with error %d", err);
     ESP_LOGE(TAG, "Buffer size needed for base64 encoding = %d \n", *olen);
     ESP_LOGE(TAG, "Buffer size allocated = %d \n", img_buff_size);
 
