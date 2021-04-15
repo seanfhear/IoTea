@@ -31,11 +31,11 @@ Once you have completed these steps you can build and flash the program onto the
 # Building/Flashing
 Run the espressif tooling and navigate to the iotea-camera directory. From there run the following commands.
 1. Run `idf.py set-target esp32` This only needs to be run once after cloning
-2. Run `idf.py menuconfig` To set the config options for the project. 
+2. Run `idf.py menuconfig` to set the config options for the project. 
     1. **Set config values:** 
         * Navigate into the **IoTea Camera** menu.
         ![IoTea Camera menu item in menuconfig](./images/IoTea-menu-item.png)
-        * Enter your WiFi settings (SSID and password) to allow the board to access the internet and enter your AWS info (name of thing and client ID).
+        * Enter your plant name (should be exactly the same as you used for the sensors in `../firmware/mos.yml`), your WiFi settings, your ASW Thing name you created for the ESP-EYE and your AWS Client ID.
         ![IoTea settings menu](./images/IoTea-settings.png)
     2. **Enable PSRAM:** 
         * Navigate into the **Component config** menu.
