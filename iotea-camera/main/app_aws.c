@@ -33,14 +33,7 @@ extern const uint8_t certificate_pem_crt_end[] asm("_binary_certificate_pem_crt_
 extern const uint8_t private_pem_key_start[] asm("_binary_private_pem_key_start");
 extern const uint8_t private_pem_key_end[] asm("_binary_private_pem_key_end");
 
-/**
- * @brief Default MQTT HOST URL is pulled from the aws_iot_config.h
- */
 char HostAddress[255] = AWS_IOT_MQTT_HOST;
-
-/**
- * @brief Default MQTT port is pulled from the aws_iot_config.h
- */
 uint32_t port = AWS_IOT_MQTT_PORT;
 
 void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, uint16_t topicNameLen,
@@ -72,8 +65,8 @@ void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data)
 
 esp_err_t aws_mqtt_init(AWS_IoT_Client *client)
 {
+  // Set AWS Client initialization parameters
   IoT_Client_Init_Params mqttInitParams = iotClientInitParamsDefault;
-  IoT_Client_Connect_Params connectParams = iotClientConnectParamsDefault;
 
   ESP_LOGI(TAG, "AWS IoT SDK Version %d.%d.%d-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_TAG);
 
@@ -91,12 +84,16 @@ esp_err_t aws_mqtt_init(AWS_IoT_Client *client)
   mqttInitParams.disconnectHandler = disconnectCallbackHandler;
   mqttInitParams.disconnectHandlerData = NULL;
 
+  // Initialize AWS MQTT
   IoT_Error_t rc = aws_iot_mqtt_init(client, &mqttInitParams);
   if (SUCCESS != rc)
   {
     ESP_LOGE(TAG, "aws_iot_mqtt_init returned error : %d ", rc);
     return ESP_FAIL;
   }
+
+  // Set IoT Client connection parameters
+  IoT_Client_Connect_Params connectParams = iotClientConnectParamsDefault;
 
   connectParams.keepAliveIntervalInSec = 10;
   connectParams.isCleanSession = true;
@@ -105,6 +102,7 @@ esp_err_t aws_mqtt_init(AWS_IoT_Client *client)
   connectParams.clientIDLen = (uint16_t)strlen(CONFIG_AWS_IOT_CLIENT_ID);
   connectParams.isWillMsgPresent = false;
 
+  // Connect to AWS
   ESP_LOGI(TAG, "Connecting to AWS...");
   do
   {
@@ -116,6 +114,7 @@ esp_err_t aws_mqtt_init(AWS_IoT_Client *client)
     }
   } while (SUCCESS != rc);
 
+  // Turn back on autoreconnect
   rc = aws_iot_mqtt_autoreconnect_set_status(client, true);
   if (SUCCESS != rc)
   {
@@ -128,9 +127,11 @@ esp_err_t aws_mqtt_init(AWS_IoT_Client *client)
 
 void aws_task(void *param)
 {
+  // Initialize AWS Client
   AWS_IoT_Client client;
   ESP_ERROR_CHECK(aws_mqtt_init(&client));
 
+  // Subscribe to the trigger topic for PLANT_NAME
   char topic_name[100];
   sprintf(topic_name, "IoTea/%s/trigger", CONFIG_PLANT_NAME);
 
@@ -146,23 +147,22 @@ void aws_task(void *param)
   }
   ESP_LOGI(TAG, "Successfully subscribed to topic");
 
+  // Loop continuously to listen for messages on the topic. Yields to provide time to process message
   while ((NETWORK_ATTEMPTING_RECONNECT == rc || NETWORK_RECONNECTED == rc || SUCCESS == rc))
   {
-    //Max time the yield function will wait for read messages
     rc = aws_iot_mqtt_yield(&client, 100);
     if (NETWORK_ATTEMPTING_RECONNECT == rc)
-    {
-      // If the client is attempting to reconnect we will skip the rest of the loop.
       continue;
-    }
   }
 
+  // We shouldn't ever get here so panic if we do
   ESP_LOGE(TAG, "An error occurred in the main loop.");
   abort();
 }
 
 esp_err_t start_mqtt()
 {
+  // Create the task to initialize the AWS client and to connect to MQTT
   xTaskCreatePinnedToCore(&aws_task, "aws_task", 9216, NULL, 5, NULL, 1);
   return ESP_OK;
 }
