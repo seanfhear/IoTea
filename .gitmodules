@@ -1,3 +1,6 @@
 [submodule "iotea-camera/components/esp32-camera"]
 	path = iotea-camera/components/esp32-camera
 	url = https://github.com/espressif/esp32-camera.git
+[submodule "iotea-camera/components/esp-aws-iot"]
+	path = iotea-camera/components/esp-aws-iot
+	url = https://github.com/espressif/esp-aws-iot
