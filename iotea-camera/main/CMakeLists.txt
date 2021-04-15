@@ -11,6 +11,7 @@ set(COMPONENT_SRCS
   "main.c" 
   "app_camera.c" 
   "app_wifi.c"
+  "app_aws.c"
 )
 set(COMPONENT_ADD_INCLUDEDIRS "include")
 

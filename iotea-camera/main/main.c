@@ -2,6 +2,7 @@
 #include "esp_err.h"
 #include "app_camera.h"
 #include "app_wifi.h"
+#include "app_aws.h"
 
 static const char *TAG = "main";
 
@@ -17,9 +18,9 @@ void app_main(void)
 
     uint8_t *img;
     // TODO: Figure out a way to dynamically set an appropriate buffersize?
-    // Experimentally found 100,000 to be more than enough (usually used ~64,000 for encoded image).
+    // Experimentally found 500,000 to be more than enough (usually used ~64,000 for encoded image).
     // Initially used (2560 * 1920) * sizeof(char) but this is way overkill.
-    size_t img_buff_size = 100000;
+    size_t img_buff_size = 500000;
     size_t olen = 0;
 
     err = get_base64_image(&img, img_buff_size, &olen);
@@ -27,6 +28,8 @@ void app_main(void)
         ESP_LOGE(TAG, "Camera capture failed");
 
     free(img);
+
+    start_mqtt();
 
     // Ensure nothing is broken
     ESP_ERROR_CHECK(err);
