@@ -20,7 +20,7 @@ config ESP_MAXIMUM_RETRY
 
 config AWS_IOT_THING_NAME
     string "AWS IoT Thing Name"
-    default "ESP-EYE_name"
+    default ""
     help
         AWS IoT Thing Name
 
