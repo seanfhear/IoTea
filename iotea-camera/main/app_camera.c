@@ -80,6 +80,12 @@ esp_err_t get_base64_image(uint8_t **img, size_t img_buff_size, size_t *olen)
 
   *img = (uint8_t *)malloc(img_buff_size);
 
+  if (*img == NULL)
+  {
+    ESP_LOGE(TAG, "Couldn't allocate buffer for encoding of size %d", img_buff_size);
+    return ESP_FAIL;
+  }
+
   assert(*img != NULL);
 
   int err = mbedtls_base64_encode(*img, img_buff_size, olen, fb->buf, fb->len);
