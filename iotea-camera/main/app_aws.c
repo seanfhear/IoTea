@@ -46,8 +46,7 @@ uint32_t port = AWS_IOT_MQTT_PORT;
 void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, uint16_t topicNameLen,
                                     IoT_Publish_Message_Params *params, void *pData)
 {
-  ESP_LOGI(TAG, "Subscribe callback");
-  ESP_LOGI(TAG, "%.*s\t%.*s", topicNameLen, topicName, (int)params->payloadLen, (char *)params->payload);
+  ESP_LOGI(TAG, "Message recieved in trigger topic");
 }
 
 void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data)
@@ -56,26 +55,18 @@ void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data)
   IoT_Error_t rc = FAILURE;
 
   if (NULL == pClient)
-  {
     return;
-  }
 
   if (aws_iot_is_autoreconnect_enabled(pClient))
-  {
     ESP_LOGI(TAG, "Auto Reconnect is enabled, Reconnecting attempt will start now");
-  }
   else
   {
     ESP_LOGW(TAG, "Auto Reconnect not enabled. Starting manual reconnect...");
     rc = aws_iot_mqtt_attempt_reconnect(pClient);
     if (NETWORK_RECONNECTED == rc)
-    {
       ESP_LOGW(TAG, "Manual Reconnect Successful");
-    }
     else
-    {
       ESP_LOGW(TAG, "Manual Reconnect Failed - %d", rc);
-    }
   }
 }
 
@@ -120,7 +111,6 @@ void aws_iot_task(void *param)
   connectParams.keepAliveIntervalInSec = 10;
   connectParams.isCleanSession = true;
   connectParams.MQTTVersion = MQTT_3_1_1;
-  /* Client ID is set in the menuconfig of the example */
   connectParams.pClientID = CONFIG_AWS_IOT_CLIENT_ID;
   connectParams.clientIDLen = (uint16_t)strlen(CONFIG_AWS_IOT_CLIENT_ID);
   connectParams.isWillMsgPresent = false;
@@ -136,11 +126,6 @@ void aws_iot_task(void *param)
     }
   } while (SUCCESS != rc);
 
-  /*
-     * Enable Auto Reconnect functionality. Minimum and Maximum time of Exponential backoff are set in aws_iot_config.h
-     *  #AWS_IOT_MQTT_MIN_RECONNECT_WAIT_INTERVAL
-     *  #AWS_IOT_MQTT_MAX_RECONNECT_WAIT_INTERVAL
-     */
   rc = aws_iot_mqtt_autoreconnect_set_status(&client, true);
   if (SUCCESS != rc)
   {
@@ -148,7 +133,10 @@ void aws_iot_task(void *param)
     abort();
   }
 
-  const char *TOPIC = "test_topic/esp32";
+  char topic_name[100];
+  sprintf(topic_name, "IoTea/%s/trigger", CONFIG_PLANT_NAME);
+
+  const char *TOPIC = (const char *)&topic_name;
   const int TOPIC_LEN = strlen(TOPIC);
 
   ESP_LOGI(TAG, "Subscribing...");

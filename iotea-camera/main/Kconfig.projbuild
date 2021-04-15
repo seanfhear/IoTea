@@ -1,5 +1,11 @@
 menu "IoTea Camera"
 
+config PLANT_NAME
+    string "Plant Name"
+    default ""
+    help
+        The name of your plant. This should be the same as what you set for the ESP32.
+
 config ESP_WIFI_SSID
     string "WiFi SSID"
     default ""
