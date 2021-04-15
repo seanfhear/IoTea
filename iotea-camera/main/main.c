@@ -1,13 +1,20 @@
 #include "esp_log.h"
 #include "app_camera.h"
+#include "app_wifi.h"
 
 static const char *TAG = "main";
 
 void app_main(void)
 {
-    esp_err_t err = initialize_camera();
+    initialize_wifi();
+    esp_err_t err;
+    // esp_err_t err = initialize_wifi();
+    // if (err != ESP_OK)
+    //     ESP_LOGE(TAG, "WiFi init failed with error 0x%x", err);
+
+    err = initialize_camera();
     if (err != ESP_OK)
-        ESP_LOGE(TAG, "Camera init failed");
+        ESP_LOGE(TAG, "Camera init failed with error 0x%x", err);
 
     uint8_t *img;
     // TODO: Figure out a way to dynamically set an appropriate buffersize?

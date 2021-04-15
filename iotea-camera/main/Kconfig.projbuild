@@ -12,4 +12,10 @@ config ESP_WIFI_PASSWORD
     help
 	WiFi password (WPA or WPA2) for the ESP-EYE to use.
 
+config ESP_MAXIMUM_RETRY
+    int "Maximum retries"
+    default 5
+    help
+    Set the maximum retries for trying to connect to the WiFi.
+
 endmenu
