@@ -44,6 +44,16 @@ Run the espressif tooling and navigate to the iotea-camera directory. From there
         ![ESP32 specific menu](./images/ESP32-Specific-menu.png)
         * Enable **Support for external, SPI-connected RAM**.
           ![Enable PSRAM](./images/Enable-PSRAM.png)
+    3. **Add AWS hostname:**
+        * In your AWS IoT Core console, click on "Settings" in the bottom left.
+        * Copy the custom endpoint.
+        ![AWS IoT Settings menu](./images/aws-settings.png)
+        * Navigate into the **Component config** menu.
+        ![Component config menu](./images/Component-config-menu.png)
+        * Scroll down and navigate into the **Amazon Web Services IoT Platform** menu.
+        ![AWS config menu](./images/AWS-menu.png)
+        * Paste the custom endpoint that you copied into the **AWS IoT Endpoint Hostname** option.
+        ![AWS hostname option](./images/aws-hostname.png)
 3. Run `idf.py build` to build the entire project and required components.
 4. Run `idf.py -p PORT flash` to flash the build project onto the board. Replace PORT with the serial port the board is connected to. The serial ports will have the following patterns in their names:
     * Windows: names like `COM1`
