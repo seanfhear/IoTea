@@ -5,11 +5,12 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
-
+#include "cJSON.h"
 #include "aws_iot_config.h"
 #include "aws_iot_mqtt_client_interface.h"
 
 static const char *TAG = "app_aws";
+static const char *IMAGE_CATEGORY = "image";
 
 extern const uint8_t aws_root_ca_pem_start[] asm("_binary_aws_root_ca_pem_start");
 extern const uint8_t aws_root_ca_pem_end[] asm("_binary_aws_root_ca_pem_end");
@@ -24,7 +25,18 @@ uint32_t port = AWS_IOT_MQTT_PORT;
 void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, uint16_t topicNameLen,
                                     IoT_Publish_Message_Params *params, void *pData)
 {
-  ESP_LOGI(TAG, "Message recieved in trigger topic");
+  ESP_LOGI(TAG, "Recieved trigger message");
+
+  cJSON *root = cJSON_Parse(params->payload);
+  cJSON *category = cJSON_GetObjectItem(root, "category");
+
+  if (strcmp(category->valuestring, IMAGE_CATEGORY) != 0)
+  {
+    ESP_LOGI(TAG, "Trigger is not for camera");
+    return;
+  }
+
+  cJSON_Delete(root);
 }
 
 void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data)
