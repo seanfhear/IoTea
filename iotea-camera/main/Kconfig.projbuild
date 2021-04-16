@@ -1,0 +1,39 @@
+menu "IoTea Camera"
+
+config PLANT_NAME
+    string "Plant Name"
+    default ""
+    help
+        The name of your plant. This should be the same as what you set for the ESP32.
+
+config ESP_WIFI_SSID
+    string "WiFi SSID"
+    default ""
+    help
+	Wifi SSID (network name) for the ESP-EYE to connect to.
+
+config ESP_WIFI_PASSWORD
+    string "WiFi Password"
+    default ""
+    help
+	WiFi password (WPA or WPA2) for the ESP-EYE to use.
+
+config ESP_MAXIMUM_RETRY
+    int "Maximum retries"
+    default 5
+    help
+    Set the maximum retries for trying to connect to the WiFi.
+
+config AWS_IOT_THING_NAME
+    string "AWS IoT Thing Name"
+    default ""
+    help
+        AWS IoT Thing Name
+
+config AWS_IOT_CLIENT_ID
+    string "AWS IoT Client ID"
+    default ""
+    help
+        AWS IoT Client Name
+
+endmenu
