@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "app_aws.h"
+#include "app_camera.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -37,6 +38,21 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
   }
 
   cJSON_Delete(root);
+
+  uint8_t *img;
+  // TODO: Figure out a way to dynamically set an appropriate buffersize?
+  // Experimentally found 500,000 to be more than enough (usually used ~64,000 for encoded image).
+  // Initially used (2560 * 1920) * sizeof(char) but this is way overkill.
+  size_t img_buff_size = 500000;
+  size_t olen = 0;
+
+  esp_err_t err = get_base64_image(&img, img_buff_size, &olen);
+  if (err != ESP_OK)
+    ESP_LOGE(TAG, "Camera capture failed");
+  else
+    ESP_LOGI(TAG, "Camera capture succeeded");
+
+  free(img);
 }
 
 void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data)

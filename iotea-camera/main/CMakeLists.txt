@@ -4,6 +4,7 @@ set(COMPONENT_REQUIRES
   mbedtls
   nvs_flash
   esp-aws-iot
+  json
 )
 set(COMPONENT_PRIV_REQUIRES )
 
