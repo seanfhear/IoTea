@@ -29,8 +29,17 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
   ESP_LOGI(TAG, "Recieved trigger message");
 
   cJSON *root = cJSON_Parse(params->payload);
+  if (root == NULL)
+  {
+    ESP_LOGI(TAG, "Trigger is not for camera");
+    return;
+  }
   cJSON *category = cJSON_GetObjectItem(root, "category");
-
+  if (category == NULL)
+  {
+    ESP_LOGI(TAG, "Trigger is not for camera");
+    return;
+  }
   if (strcmp(category->valuestring, IMAGE_CATEGORY) != 0)
   {
     ESP_LOGI(TAG, "Trigger is not for camera");
@@ -41,16 +50,37 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
 
   uint8_t *img;
   // TODO: Figure out a way to dynamically set an appropriate buffersize?
-  // Experimentally found 500,000 to be more than enough (usually used ~64,000 for encoded image).
+  // Experimentally found 200,000 to be more than enough (usually used ~64,000 for encoded image).
   // Initially used (2560 * 1920) * sizeof(char) but this is way overkill.
-  size_t img_buff_size = 500000;
+  size_t img_buff_size = 200000;
   size_t olen = 0;
 
   esp_err_t err = get_base64_image(&img, img_buff_size, &olen);
   if (err != ESP_OK)
+  {
     ESP_LOGE(TAG, "Camera capture failed");
+    // TODO publish MQTT message for failure
+  }
   else
+  {
     ESP_LOGI(TAG, "Camera capture succeeded");
+    ESP_LOGI(TAG, "Base64 encoded image is %d bytes long", olen);
+  }
+
+  IoT_Publish_Message_Params publishParams;
+  publishParams.qos = QOS1;
+  publishParams.payload = (void *)img;
+  publishParams.isRetained = 0;
+
+  publishParams.payloadLen = olen;
+  IoT_Error_t rc = aws_iot_mqtt_publish(pClient, topicName, topicNameLen, &publishParams);
+  if (rc == MQTT_REQUEST_TIMEOUT_ERROR)
+  {
+    ESP_LOGW(TAG, "QOS1 publish ack not received.");
+    rc = SUCCESS;
+  }
+  else if (rc != SUCCESS)
+    ESP_LOGE(TAG, "Failed to publish image rc:%d", rc);
 
   free(img);
 }
