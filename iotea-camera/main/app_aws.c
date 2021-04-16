@@ -52,7 +52,7 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
   // TODO: Figure out a way to dynamically set an appropriate buffersize?
   // Experimentally found 200,000 to be more than enough (usually used ~64,000 for encoded image).
   // Initially used (2560 * 1920) * sizeof(char) but this is way overkill.
-  size_t img_buff_size = 200000;
+  size_t img_buff_size = 100000;
   size_t olen = 0;
 
   esp_err_t err = get_base64_image(&img, img_buff_size, &olen);
@@ -189,7 +189,7 @@ void aws_task(void *param)
   ESP_LOGI(TAG, "Successfully subscribed to topic");
 
   // Loop continuously to listen for messages on the topic. Yields to provide time to process message
-  while ((NETWORK_ATTEMPTING_RECONNECT == rc || NETWORK_RECONNECTED == rc || SUCCESS == rc))
+  while (true)
   {
     rc = aws_iot_mqtt_yield(&client, 100);
     if (NETWORK_ATTEMPTING_RECONNECT == rc)
@@ -204,6 +204,6 @@ void aws_task(void *param)
 esp_err_t start_mqtt()
 {
   // Create the task to initialize the AWS client and to connect to MQTT
-  xTaskCreatePinnedToCore(&aws_task, "aws_task", 9216, NULL, 5, NULL, 1);
+  xTaskCreatePinnedToCore(&aws_task, "aws_task", 56320, NULL, 5, NULL, 1);
   return ESP_OK;
 }
