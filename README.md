@@ -15,7 +15,7 @@ alt="System Architecture" border="10"/>
 <img src="https://raw.githubusercontent.com/seanfhear/IoTea/main/images/hardware_diagram.png" 
 alt="Hardware Diagram" border="10" />
 
-## Further Install Instructions:
+## Further Install Instructions
 
 * [Main Board Firmware (Vitals, Stepper motor and Water Pump)](https://github.com/seanfhear/IoTea/tree/main/firmware)
 * [Telegram Bot](https://github.com/seanfhear/IoTea/tree/main/bot)
