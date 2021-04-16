@@ -4,7 +4,7 @@
 
 ## Video Demonstration
 
-<a href="https://www.youtube.com/embed/nGD-0TNYtso" target="_blank"><img src="https://i.imgur.com/ymsEAPT.png" 
+<a href="https://www.youtube.com/watch?v=nGD-0TNYtso" target="_blank"><img src="https://i.imgur.com/ymsEAPT.png" 
 alt="Video Demonstration" width="960" height="540" border="10" /></a>
 
 ## System Architecture Diagram
