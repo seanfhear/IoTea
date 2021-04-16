@@ -50,7 +50,7 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
 
   uint8_t *img;
   // TODO: Figure out a way to dynamically set an appropriate buffersize?
-  // Experimentally found 200,000 to be more than enough (usually used ~64,000 for encoded image).
+  // Experimentally found 100,000 to be more than enough (usually used ~64,000 for encoded image).
   // Initially used (2560 * 1920) * sizeof(char) but this is way overkill.
   size_t img_buff_size = 100000;
   size_t olen = 0;
@@ -73,7 +73,14 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
   publishParams.isRetained = 0;
 
   publishParams.payloadLen = olen;
-  IoT_Error_t rc = aws_iot_mqtt_publish(pClient, topicName, topicNameLen, &publishParams);
+
+  char topic_name[100];
+  sprintf(topic_name, "IoTea/%s/camera", CONFIG_PLANT_NAME);
+
+  const char *TOPIC = (const char *)&topic_name;
+  const int TOPIC_LEN = strlen(TOPIC);
+
+  IoT_Error_t rc = aws_iot_mqtt_publish(pClient, TOPIC, TOPIC_LEN, &publishParams);
   if (rc == MQTT_REQUEST_TIMEOUT_ERROR)
   {
     ESP_LOGW(TAG, "QOS1 publish ack not received.");
